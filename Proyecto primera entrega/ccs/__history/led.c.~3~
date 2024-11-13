@@ -1,0 +1,21 @@
+#include <16F877A.h>
+#fuses HS, NOWDT, NOLVP, NOPROTECT
+#use delay(clock=4000000)
+#use I2C(SLAVE, SDA=PIN_C4, SCL=PIN_C3, address=0x20)
+
+void main() {
+    set_tris_b(0x00); // Configura PORTB como salida (para LED)
+    output_b(0x00);   // Apaga todos los LEDs inicialmente
+    
+    while (TRUE) {
+        if (i2c_poll()) { // Comprueba si hay datos en el bus I2C
+            char command = i2c_read(); // Lee el comando enviado por el Arduino
+            if (command == '1') {
+                output_high(PIN_B0); // Enciende el LED conectado a RB0
+            } else if (command == '0') {
+                output_low(PIN_B0);  // Apaga el LED
+            }
+        }
+    }
+}
+

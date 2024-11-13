@@ -1,0 +1,24 @@
+#include <16F877A.h>
+#FUSES HS, NOWDT, NOPROTECT, NOLVP
+#use delay(clock=4000000)
+#use I2C(SLAVE, SDA=PIN_C4, SCL=PIN_C3, ADDRESS=0xA0, FORCE_HW)  // Pines correctos para I2C hardware
+
+void main() {
+   int8 dato;
+   
+   set_tris_d(0x00);  // Configura PORTD como salida (para el LED en PIN_D0)
+   output_d(0x00);    // Asegura que PORTD está apagado inicialmente
+
+   while (TRUE) {
+      if (i2c_poll()) { // Verifica si se han recibido datos en el buffer I2C
+         dato = i2c_read();  // Lee el byte recibido
+
+         if (dato == 1) {
+            output_high(PIN_D0);  // Enciende el LED en PIN_D0
+         } else if (dato == 0) {
+            output_low(PIN_D0);   // Apaga el LED en PIN_D0
+         }
+      }
+   }
+}
+

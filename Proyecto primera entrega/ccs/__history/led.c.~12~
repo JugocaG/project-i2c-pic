@@ -1,0 +1,24 @@
+#include <16F877A.h>
+#fuses XT, NOWDT, NOPROTECT, NOLVP
+#use delay(clock=4000000)
+#use i2c(SLAVE, SDA=PIN_C4, SCL=PIN_C3, address=0x22, FORCE_HW)  // Dirección esclavo 0x11
+
+#define LED_PIN PIN_B0  // LED conectado al pin B0 del PIC
+
+void main() {
+    set_tris_b(0x00);  // Configura PORTB como salida
+    output_low(LED_PIN);  // Asegura que el LED esté apagado inicialmente
+
+    while (TRUE) {
+        if (i2c_poll()) {  // Verifica si hay datos I2C disponibles
+            int brightness = i2c_read();  // Lee el valor enviado por el Arduino
+
+            if (brightness > 127) {
+                output_high(LED_PIN);  // Enciende el LED si el brillo es alto
+            } else {
+                output_low(LED_PIN);   // Apaga el LED si el brillo es bajo
+            }
+        }
+    }
+}
+

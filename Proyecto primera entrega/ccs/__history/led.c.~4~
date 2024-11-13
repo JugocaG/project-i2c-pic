@@ -1,0 +1,34 @@
+#include <16F877A.h>
+#fuses HS, NOWDT, NOPROTECT, NOLVP
+#use delay(clock=4000000)  // PIC operando a 4 MHz
+#use i2c(SLAVE, SDA=PIN_C4, SCL=PIN_C3, ADDRESS=0x30, FORCE_HW)  // Esclavo I2C con dirección 0x30
+
+#INT_SSP
+void ssp_interrupt() {
+    int8 command;
+
+    if (i2c_isr_state() < 0x80) {  // El maestro está enviando datos
+        command = i2c_read();       // Lee el comando enviado por el maestro
+
+        if (command == 1) {
+            output_high(PIN_B0);  // Enciende el LED en RB0
+        } else if (command == 0) {
+            output_low(PIN_B0);   // Apaga el LED en RB0
+        }
+    } else {
+        i2c_read();  // Necesario para completar la comunicación aunque no enviemos datos al maestro
+    }
+}
+
+void main() {
+    set_tris_b(0x00);  // Configura PORTB como salida (para el LED en RB0)
+    output_b(0x00);    // Asegúrate de que todos los pines están inicialmente apagados
+
+    enable_interrupts(INT_SSP);   // Habilita la interrupción I2C
+    enable_interrupts(GLOBAL);    // Habilita interrupciones globales
+
+    while (TRUE) {
+        // El PIC espera comandos I2C y responde en consecuencia.
+    }
+}
+

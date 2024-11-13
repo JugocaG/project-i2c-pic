@@ -1,0 +1,22 @@
+#include <16F877A.h>
+#fuses XT,NOWDT,NOPROTECT,NOLVP
+#use delay(clock=4000000)
+#use i2c(SLAVE, SDA=PIN_C4, SCL=PIN_C3, address=0x22, FORCE_HW)  // La dirección aquí es arbitraria
+
+#define LED_PIN PIN_B0  // LED conectado al pin B0
+
+void main() {
+    set_tris_b(0x00);  // Configura PORTB como salida
+    output_low(LED_PIN);
+
+    while (TRUE) {
+        char command = i2c_read();  // Leer comando enviado por el maestro
+
+        if (command == 1) {
+            output_high(LED_PIN);  // Enciende el LED
+        } else if (command == 0) {
+            output_low(LED_PIN);   // Apaga el LED
+        }
+    }
+}
+
