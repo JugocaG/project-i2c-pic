@@ -2,8 +2,8 @@ import cv2
 import time
 
 # Especifica la ubicación de los archivos del modelo MobileNet SSD.
-prototxt = "model/MobileNetSSD_deploy.prototxt.txt"
-model = "model/MobileNetSSD_deploy.caffemodel"
+prototxt = "Proyecto Segunda entrega/model/MobileNetSSD_deploy.prototxt.txt"
+model = "Proyecto Segunda entrega/model/MobileNetSSD_deploy.caffemodel"
 
 # Define un diccionario que asocia números de clases a etiquetas relevantes.
 filtered_classes = {
@@ -23,7 +23,7 @@ except Exception as e:
     exit()
 
 # Abre un archivo de video o usa la cámara web en tiempo real.
-cap = cv2.VideoCapture(1)  # Cambia el índice si no detecta la cámara correcta.
+cap = cv2.VideoCapture(0)  # Cambia el índice si no detecta la cámara correcta.
 
 # Calcula FPS para monitorear rendimiento.
 fps_start_time = time.time()
@@ -36,13 +36,17 @@ while True:
         break
 
     height, width, _ = frame.shape
+    mid_x = width // 2  # División del cuadro en dos mitades (izquierda y derecha)
+
     blob = cv2.dnn.blobFromImage(frame, 0.007843, (300, 300), (127.5, 127.5, 127.5))
     net.setInput(blob)
     detections = net.forward()
 
     # Contadores
-    count_people_bikes = 0
-    count_vehicles = 0
+    count_left_zone_persons = 0
+    count_right_zone_persons = 0
+    count_left_zone_vehicles = 0
+    count_right_zone_vehicles = 0
 
     for detection in detections[0][0]:
         confidence = detection[2]
@@ -50,7 +54,7 @@ while True:
             class_id = int(detection[1])
             label = filtered_classes.get(class_id, None)
             
-            if label:  # Solo procesa clases relevantes.
+            if label:
                 box = detection[3:7] * [width, height, width, height]
                 x_start, y_start, x_end, y_end = box.astype(int)
                 
@@ -58,18 +62,31 @@ while True:
                 cv2.rectangle(frame, (x_start, y_start), (x_end, y_end), (0, 255, 0), 2)
                 cv2.putText(frame, f"{label} ({confidence:.2f})", (x_start, y_start - 10), 
                             cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 2)
-                
-                # Actualiza contadores
-                if label in ["persona", "bicycle"]:
-                    count_people_bikes += 1
-                elif label in ["carro", "bus", "motorbike", "tren"]:
-                    count_vehicles += 1
+
+                # Determina el centro del objeto.
+                object_center_x = (x_start + x_end) // 2
+
+                # Contar personas y vehículos en cada zona.
+                if label == "persona":
+                    if object_center_x < mid_x:
+                        count_left_zone_persons += 1
+                    else:
+                        count_right_zone_persons += 1
+                elif label in ["bicycle", "bus", "carro", "motorbike", "tren"]:
+                    if object_center_x < mid_x:
+                        count_left_zone_vehicles += 1
+                    else:
+                        count_right_zone_vehicles += 1
 
     # Muestra los conteos en el frame.
-    cv2.putText(frame, f"Personas y Bicicletas: {count_people_bikes}", (10, 40), 
+    cv2.putText(frame, f"Personas Izquierda: {count_left_zone_persons}", (10, 40), 
                 cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-    cv2.putText(frame, f"Vehiculos: {count_vehicles}", (10, 70), 
+    cv2.putText(frame, f"Personas Derecha: {count_right_zone_persons}", (10, 70), 
                 cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+    cv2.putText(frame, f"Vehiculos Izquierda: {count_left_zone_vehicles}", (10, 100), 
+                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 2)
+    cv2.putText(frame, f"Vehiculos Derecha: {count_right_zone_vehicles}", (10, 130), 
+                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 255), 2)
 
     # Muestra FPS en la esquina superior izquierda.
     frame_count += 1
