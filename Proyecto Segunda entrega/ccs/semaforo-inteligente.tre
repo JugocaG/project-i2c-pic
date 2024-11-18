@@ -1,0 +1,8 @@
+ÀÄsemaforo-inteligente
+   ÃÄMAIN  0/35  Ram=0
+   ³  ÃÄ@cinit1  (Inline)  Ram=0
+   ³  ÀÄ@cinit2  (Inline)  Ram=0
+   ÀÄi2c_isr  0/74  Ram=1
+      ÀÄencenderLedsPorComando  (Inline)  Ram=1
+         ÃÄapagar_todos_leds  0/25  Ram=0
+         ÀÄapagar_todos_leds  0/25  Ram=0

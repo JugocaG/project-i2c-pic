@@ -43,10 +43,8 @@ while True:
     detections = net.forward()
 
     # Contadores
-    count_left_zone_persons = 0
-    count_right_zone_persons = 0
-    count_left_zone_vehicles = 0
-    count_right_zone_vehicles = 0
+    count_left_zone = 0
+    count_right_zone = 0
 
     for detection in detections[0][0]:
         confidence = detection[2]
@@ -54,7 +52,7 @@ while True:
             class_id = int(detection[1])
             label = filtered_classes.get(class_id, None)
             
-            if label:
+            if label == "persona":  # Solo cuenta personas en las zonas
                 box = detection[3:7] * [width, height, width, height]
                 x_start, y_start, x_end, y_end = box.astype(int)
                 
@@ -63,30 +61,18 @@ while True:
                 cv2.putText(frame, f"{label} ({confidence:.2f})", (x_start, y_start - 10), 
                             cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 2)
 
-                # Determina el centro del objeto.
-                object_center_x = (x_start + x_end) // 2
-
-                # Contar personas y vehículos en cada zona.
-                if label == "persona":
-                    if object_center_x < mid_x:
-                        count_left_zone_persons += 1
-                    else:
-                        count_right_zone_persons += 1
-                elif label in ["bicycle", "bus", "carro", "motorbike", "tren"]:
-                    if object_center_x < mid_x:
-                        count_left_zone_vehicles += 1
-                    else:
-                        count_right_zone_vehicles += 1
+                # Determina en qué zona está la persona
+                person_center_x = (x_start + x_end) // 2
+                if person_center_x < mid_x:
+                    count_left_zone += 1
+                else:
+                    count_right_zone += 1
 
     # Muestra los conteos en el frame.
-    cv2.putText(frame, f"Personas Izquierda: {count_left_zone_persons}", (10, 40), 
+    cv2.putText(frame, f"Personas Izquierda: {count_left_zone}", (10, 40), 
                 cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-    cv2.putText(frame, f"Personas Derecha: {count_right_zone_persons}", (10, 70), 
+    cv2.putText(frame, f"Personas Derecha: {count_right_zone}", (10, 70), 
                 cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-    cv2.putText(frame, f"Vehiculos Izquierda: {count_left_zone_vehicles}", (10, 100), 
-                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 2)
-    cv2.putText(frame, f"Vehiculos Derecha: {count_right_zone_vehicles}", (10, 130), 
-                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 255), 2)
 
     # Muestra FPS en la esquina superior izquierda.
     frame_count += 1

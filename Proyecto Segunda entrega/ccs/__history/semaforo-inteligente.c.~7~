@@ -1,0 +1,58 @@
+#include <16F877A.h>
+#fuses XT, NOWDT, NOPROTECT, NOLVP
+#use delay(clock=4000000)
+#use i2c(SLAVE, SDA=PIN_C4, SCL=PIN_C3, address=0x22, FORCE_HW)
+
+#define LED_VERDE_IZQ PIN_C0
+#define LED_AMARILLO_IZQ PIN_C1
+#define LED_ROJO_IZQ PIN_C2
+#define LED_VERDE_DER PIN_C3
+#define LED_AMARILLO_DER PIN_C4
+#define LED_ROJO_DER PIN_C5
+
+void encenderLED(int led) {
+    // Apaga todos los LEDs
+    output_low(LED_VERDE_IZQ);
+    output_low(LED_AMARILLO_IZQ);
+    output_low(LED_ROJO_IZQ);
+    output_low(LED_VERDE_DER);
+    output_low(LED_AMARILLO_DER);
+    output_low(LED_ROJO_DER);
+
+    // Enciende el LED específico
+    output_high(led);
+}
+
+#INT_SSP
+void i2c_isr() {
+    char comando = i2c_read();  // Leer comando del maestro I2C
+
+    // Control del semáforo según el comando recibido
+    switch (comando) {
+        case 'A':  // Verde izquierda
+            encenderLED(LED_VERDE_IZQ);
+            break;
+        case 'B':  // Amarillo izquierda
+            encenderLED(LED_AMARILLO_IZQ);
+            break;
+        case 'C':  // Verde derecha
+            encenderLED(LED_VERDE_DER);
+            break;
+        case 'D':  // Amarillo derecha
+            encenderLED(LED_AMARILLO_DER);
+            break;
+        default:   // Si el comando no es reconocido, rojo por defecto
+            encenderLED(LED_ROJO_IZQ);
+            break;
+    }
+}
+
+void main() {
+    enable_interrupts(INT_SSP);   // Habilitar interrupciones I2C
+    enable_interrupts(GLOBAL);   // Habilitar interrupciones globales
+
+    while (TRUE) {
+        // Loop principal en espera de comandos
+    }
+}
+
