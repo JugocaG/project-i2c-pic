@@ -2,8 +2,8 @@ import cv2
 import time
 
 # Especifica la ubicación de los archivos del modelo MobileNet SSD.
-prototxt = "model/MobileNetSSD_deploy.prototxt.txt"
-model = "model/MobileNetSSD_deploy.caffemodel"
+prototxt = "Proyecto Segunda entrega\model\MobileNetSSD_deploy.prototxt.txt"
+model = "Proyecto Segunda entrega\model\MobileNetSSD_deploy.caffemodel"
 
 # Define un diccionario que asocia números de clases a etiquetas relevantes.
 filtered_classes = {
@@ -23,7 +23,7 @@ except Exception as e:
     exit()
 
 # Abre un archivo de video o usa la cámara web en tiempo real.
-cap = cv2.VideoCapture(1)  # Cambia el índice si no detecta la cámara correcta.
+cap = cv2.VideoCapture(0)  # Cambia el índice si no detecta la cámara correcta.
 
 # Calcula FPS para monitorear rendimiento.
 fps_start_time = time.time()
