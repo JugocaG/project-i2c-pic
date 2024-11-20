@@ -16,7 +16,7 @@ buildcount=6
 [ProjectLog]
 Days=1
 D1=17-11-2024
-D1_L=9
+D1_L=10
 D1_L1=[62232]Stopped Editing.
 D1_L2=[62480]Started Editing.
 D1_L3=[62792]Stopped Editing.
@@ -26,6 +26,11 @@ D1_L6=[65161]Started Editing.
 D1_L7=[65717]Stopped Editing.
 D1_L8=[66649]Started Editing.
 D1_L9=[67047]Stopped Editing.
+TotalEdit=16
+TotalDebug=0
+D1_E=16
+D1_D=0
+D1_L10=[73035]Project Closed.
 
 [Opened Files]
 1=..\..\..\..\Corte 2\ADC Presentacion\ADC.c
