@@ -1,0 +1,74 @@
+#include <16F877A.h>
+#fuses XT, NOWDT, NOPROTECT, NOLVP
+#use delay(clock=4000000)
+#use i2c(SLAVE, SDA=PIN_C4, SCL=PIN_C3, address=0x22, FORCE_HW)
+
+#define LED_VERDE_IZQ PIN_C0
+#define LED_AMARILLO_IZQ PIN_C1
+#define LED_ROJO_IZQ PIN_C2
+#define LED_VERDE_DER PIN_C3
+#define LED_AMARILLO_DER PIN_C4
+#define LED_ROJO_DER PIN_C5
+
+char comando[20];  // Almacena el comando recibido
+
+// Función personalizada para comparar cadenas
+int compararCadenas(const char* str1, const char* str2) {
+    int i = 0;
+    while (str1[i] != '\0' && str2[i] != '\0') {
+        if (str1[i] != str2[i]) {
+            return 0;  // Las cadenas no coinciden
+        }
+        i++;
+    }
+    return (str1[i] == '\0' && str2[i] == '\0');  // Retorna 1 si son iguales
+}
+
+void encenderLED(int led) {
+    output_low(LED_VERDE_IZQ);
+    output_low(LED_AMARILLO_IZQ);
+    output_low(LED_ROJO_IZQ);
+    output_low(LED_VERDE_DER);
+    output_low(LED_AMARILLO_DER);
+    output_low(LED_ROJO_DER);
+
+    output_high(led);  // Enciende el LED específico
+}
+
+void procesarComando() {
+    if (compararCadenas(comando, "IZQ_VERDE")) {
+        encenderLED(LED_VERDE_IZQ);
+    } else if (compararCadenas(comando, "IZQ_AMARILLO")) {
+        encenderLED(LED_AMARILLO_IZQ);
+    } else if (compararCadenas(comando, "DER_VERDE")) {
+        encenderLED(LED_VERDE_DER);
+    } else if (compararCadenas(comando, "DER_AMARILLO")) {
+        encenderLED(LED_AMARILLO_DER);
+    } else {
+        // Por defecto, si no coincide comando, encender LED rojo izquierdo
+        encenderLED(LED_ROJO_IZQ);
+    }
+}
+
+#INT_SSP
+void i2c_isr() {
+    static int index = 0;
+    char dato = i2c_read();
+    if (dato == '\n' || index >= sizeof(comando) - 1) {
+        comando[index] = '\0';  // Finaliza la cadena
+        procesarComando();      // Procesa el comando
+        index = 0;              // Reinicia índice para el próximo comando
+    } else {
+        comando[index++] = dato;  // Almacena el carácter recibido
+    }
+}
+
+void main() {
+    enable_interrupts(INT_SSP);   // Habilitar interrupciones I2C
+    enable_interrupts(GLOBAL);   // Habilitar interrupciones globales
+
+    while (TRUE) {
+        // Espera interrupciones de comando
+    }
+}
+

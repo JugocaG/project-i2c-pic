@@ -1,0 +1,65 @@
+#include <16F877A.h>
+#fuses XT, NOWDT, NOPROTECT, NOLVP
+#use delay(clock=4000000)
+#use i2c(SLAVE, SDA=PIN_C4, SCL=PIN_C3, address=0x22, FORCE_HW)
+
+#define LED_VERDE_IZQ PIN_C0
+#define LED_AMARILLO_IZQ PIN_C1
+#define LED_ROJO_IZQ PIN_C2
+#define LED_VERDE_DER PIN_D0
+#define LED_AMARILLO_DER PIN_D1
+#define LED_ROJO_DER PIN_D2
+
+void encenderLED(int verde, int amarillo, int rojo) {
+    // Apaga todos los LEDs
+    output_low(LED_VERDE_IZQ);
+    output_low(LED_AMARILLO_IZQ);
+    output_low(LED_ROJO_IZQ);
+    output_low(LED_VERDE_DER);
+    output_low(LED_AMARILLO_DER);
+    output_low(LED_ROJO_DER);
+
+    // Enciende los LEDs específicos
+    output_high(verde);
+    output_high(rojo);
+    if (amarillo != -1) {
+        output_high(amarillo);
+    }
+}
+
+void procesarComando(const char* comando) {
+    if (strcmp(comando, "IZQ_VERDE") == 0) {
+        encenderLED(LED_VERDE_IZQ, -1, LED_ROJO_DER);
+    } else if (strcmp(comando, "IZQ_AMARILLO") == 0) {
+        encenderLED(-1, LED_AMARILLO_IZQ, LED_ROJO_DER);
+    } else if (strcmp(comando, "DER_VERDE") == 0) {
+        encenderLED(LED_VERDE_DER, -1, LED_ROJO_IZQ);
+    } else if (strcmp(comando, "DER_AMARILLO") == 0) {
+        encenderLED(-1, LED_AMARILLO_DER, LED_ROJO_IZQ);
+    }
+}
+
+#INT_SSP
+void i2c_isr() {
+    static char comando[20];
+    static int index = 0;
+
+    char dato = i2c_read();
+    if (dato == '\n' || index >= sizeof(comando) - 1) {
+        comando[index] = '\0';  // Termina la cadena
+        procesarComando(comando);
+        index = 0;  // Reinicia el índice
+    } else {
+        comando[index++] = dato;  // Almacena el dato recibido
+    }
+}
+
+void main() {
+    enable_interrupts(INT_SSP);   // Habilitar interrupciones I2C
+    enable_interrupts(GLOBAL);   // Habilitar interrupciones globales
+
+    while (TRUE) {
+        // Espera comandos I2C
+    }
+}
+

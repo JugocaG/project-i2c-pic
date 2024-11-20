@@ -1,0 +1,55 @@
+[PROJECT]
+Target=semaforo-inteligente.hex
+Processor_Text=PIC16F877A
+CCSVersion=5.112
+Compiler=PCM
+[Target Data]
+FileList=semaforo-inteligente.c
+[semaforo-inteligente.c]
+Type=4
+[mru-list]
+1=semaforo-inteligente.c
+
+[defines]
+buildcount=6
+
+[ProjectLog]
+Days=1
+D1=17-11-2024
+D1_L=10
+D1_L1=[62232]Stopped Editing.
+D1_L2=[62480]Started Editing.
+D1_L3=[62792]Stopped Editing.
+D1_L4=[64391]Started Editing.
+D1_L5=[64990]Stopped Editing.
+D1_L6=[65161]Started Editing.
+D1_L7=[65717]Stopped Editing.
+D1_L8=[66649]Started Editing.
+D1_L9=[67047]Stopped Editing.
+TotalEdit=16
+TotalDebug=0
+D1_E=16
+D1_D=0
+D1_L10=[73035]Project Closed.
+
+[Opened Files]
+1=..\..\..\..\Corte 2\ADC Presentacion\ADC.c
+t1=1
+2=..\..\..\..\Corte 2\Proyecto\Ejemplo Infrarrojo.c
+t2=23
+3=..\..\..\..\Corte 2\Proyecto\Ejemplo Infrarrojo LED.c
+t3=1
+4=..\..\..\deteccion de figuras (1)\ejercicio_4.c
+t4=1
+5=..\..\..\..\..\..\..\..\..\..\..\Program Files (x86)\PICC\Devices\16f877a.h
+t5=1
+6=..\..\..\..\..\..\..\..\..\..\..\Program Files (x86)\PICC\Drivers\lcd.c
+t6=1
+7=..\..\Proyecto primera entrega\ccs\led.c
+t7=1
+8=semaforo-inteligente.c
+t8=1
+Count=8
+[Units]
+Count=1
+1=semaforo-inteligente (main)
